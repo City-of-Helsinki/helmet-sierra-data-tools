@@ -1,18 +1,19 @@
 from __future__ import annotations
 
 from typing import List
-from typing import Optional
-
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, func, Integer, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from orm.base import Base
 import orm.fields
+import orm.item
+import orm.bib_item
+
 
 class Bib(Base):
-    __tablename__='bib_record'
+    __tablename__ = 'bib_record'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'
@@ -49,4 +50,10 @@ class Bib(Base):
         primaryjoin='orm.fields.Varfield.record_id == Bib.record_id',
         foreign_keys='orm.fields.Varfield.record_id',
         lazy='joined'
+    )
+    items: Mapped[List["orm.item.Item"]] = relationship(
+        "orm.item.Item",
+        secondary=orm.bib_item.BibItem.__table__,
+        back_populates="bib",
+        lazy='select'
     )

@@ -13,8 +13,9 @@ import orm.fields
 import orm.patron
 import orm.bib
 
+
 class CircTrans(Base):
-    __tablename__='circ_trans'
+    __tablename__ = 'circ_trans'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'

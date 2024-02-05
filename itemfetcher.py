@@ -2,18 +2,11 @@
 import os
 from dotenv import load_dotenv
 import pprint
-import psycopg2
-import sqlalchemy
-from sqlalchemy import create_engine, select, and_, or_
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from orm.item import Item
-from orm.patron import Patron
-from orm.circ_trans import CircTrans
-import pprint
-from datetime import *
-
-
+from datetime import datetime, timedelta
 
 load_dotenv()
 
@@ -25,6 +18,10 @@ session = Session()
 
 item = session.query(Item).filter(Item.last_checkout_gmt > datetime.now() - timedelta(days=21)).first()
 #item = session.query(CircTrans)
-print()
 
-pprint.PrettyPrinter(depth=4).pprint(item.varfields[1].__dict__)
+result = []
+if item.bib.items:
+    for qws_instance in item.bib.items:
+        result.append(qws_instance.__dict__)
+
+pprint.PrettyPrinter(depth=4).pprint(item.bib.items[0].bib.__dict__)

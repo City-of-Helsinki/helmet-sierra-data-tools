@@ -1,21 +1,22 @@
 from __future__ import annotations
 
 from typing import List
-from typing import Optional
-from decimal import *
-from datetime import *
-
+# from typing import Optional
+from decimal import Decimal
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, func, Integer, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 import orm.base
-import orm.patron 
-import orm.fields 
+import orm.bib
+import orm.bib_item
+import orm.patron
+import orm.fields
+
 
 class Item(orm.base.Base):
-    __tablename__='item_record'
+    __tablename__ = 'item_record'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'
@@ -65,4 +66,9 @@ class Item(orm.base.Base):
         foreign_keys='orm.fields.Varfield.record_id',
         lazy='joined',
         overlaps="varfields"
+    )
+    bib: Mapped["orm.bib.Bib"] = relationship(
+        "orm.bib.Bib",
+        secondary=orm.bib_item.BibItem.__table__,
+        back_populates="items"
     )
