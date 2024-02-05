@@ -1,17 +1,15 @@
 from __future__ import annotations
 
-from typing import List
-from typing import Optional
-
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, func, Integer, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from orm.base import Base
 import orm.fields
 import orm.patron
 import orm.bib
+import orm.item
 
 
 class CircTrans(Base):
@@ -29,25 +27,21 @@ class CircTrans(Base):
     patron: Mapped["orm.patron.Patron"] = relationship(
         "orm.patron.Patron",
         primaryjoin='orm.patron.Patron.record_id == CircTrans.patron_record_id',
-        foreign_keys='orm.patron.Patron.record_id',
-        #lazy='joined'
+        foreign_keys='orm.patron.Patron.record_id'
     )
     item_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.item.record_id"))
     item: Mapped["orm.item.Item"] = relationship(
         "orm.item.Item",
         primaryjoin='orm.item.Item.record_id == CircTrans.item_record_id',
-        foreign_keys='orm.item.Item.record_id',
-        #lazy='joined'
+        foreign_keys='orm.item.Item.record_id'
     )
     volume_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.volume.record_id"))
     bib_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.bib.record_id"))
     bib: Mapped["orm.bib.Bib"] = relationship(
         "orm.bib.Bib",
         primaryjoin='orm.bib.Bib.record_id == CircTrans.bib_record_id',
-        foreign_keys='orm.bib.Bib.record_id',
-        #lazy='joined'
+        foreign_keys='orm.bib.Bib.record_id'
     )
-
     stat_group_code_num: Mapped[int] = mapped_column("stat_group_code_num")
     due_date_gmt: Mapped[datetime] = mapped_column("due_date_gmt")
     count_type_code_num: Mapped[int] = mapped_column("count_type_code_num")

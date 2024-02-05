@@ -40,7 +40,7 @@ class Item(orm.base.Base):
     copy_num: Mapped[int] = mapped_column("copy_num")
     checkout_statistic_group_code_num: Mapped[int] = mapped_column("checkout_statistic_group_code_num")
     last_patron_record_metadata_id: Mapped[int] = mapped_column(ForeignKey("sierra_view.patron_record.record_id"))
-    last_patron: Mapped["Patron"] = relationship("Patron", back_populates="last_patron_of_items")#, lazy='joined')
+    last_patron: Mapped["orm.patron.Patron"] = relationship("Patron", back_populates="last_patron_of_items")
     inventory_gmt: Mapped[datetime] = mapped_column("inventory_gmt")
     checkin_statistics_group_code_num: Mapped[int] = mapped_column("checkin_statistics_group_code_num")
     use3_count: Mapped[int] = mapped_column("use3_count")
