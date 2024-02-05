@@ -1,17 +1,19 @@
 from __future__ import annotations
 
 from typing import List
-from typing import Optional
-from decimal import *
-from datetime import *
+from decimal import Decimal
+from datetime import datetime
 
-from sqlalchemy import ForeignKey, func, Integer, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, Integer
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from orm.base import Base
+import orm.fields
+import orm.item
+
 
 class Patron(Base):
-    __tablename__='patron_record'
+    __tablename__ = 'patron_record'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'
@@ -55,18 +57,18 @@ class Patron(Base):
     fullname: Mapped["FullName"] = relationship(back_populates="patron", lazy='joined')
     addresses: Mapped[List["Address"]] = relationship(back_populates="patron", lazy='joined')
     phones: Mapped[List["Phone"]] = relationship(back_populates="patron", lazy='joined')
-    varfields: Mapped[List["Varfield"]] = relationship(
+    varfields: Mapped[List["orm.fields.Varfield"]] = relationship(
         "Varfield",
         primaryjoin='Varfield.record_id == Patron.record_id',
         foreign_keys='Varfield.record_id',
         lazy='joined',
         overlaps="varfields"
     )
-    last_patron_of_items: Mapped[List["Item"]] = relationship(back_populates="last_patron")
+    last_patron_of_items: Mapped[List["orm.item.Item"]] = relationship(back_populates="last_patron")
 
 
 class Address(Base):
-    __tablename__='patron_record_address'
+    __tablename__ = 'patron_record_address'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'
@@ -86,8 +88,9 @@ class Address(Base):
     postal_code: Mapped[str] = mapped_column("postal_code")
     country: Mapped[str] = mapped_column("country")
 
+
 class AddressType(Base):
-    __tablename__='patron_record_address_type'
+    __tablename__ = 'patron_record_address_type'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'
@@ -96,8 +99,9 @@ class AddressType(Base):
     code: Mapped[str] = mapped_column("code")
     address: Mapped["Address"] = relationship(back_populates="address_type")
 
+
 class FullName(Base):
-    __tablename__='patron_record_fullname'
+    __tablename__ = 'patron_record_fullname'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'
@@ -112,8 +116,9 @@ class FullName(Base):
     last_name: Mapped[str] = mapped_column("last_name")
     suffix: Mapped[str] = mapped_column("suffix")
 
+
 class Phone(Base):
-    __tablename__='patron_record_phone'
+    __tablename__ = 'patron_record_phone'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'
@@ -126,8 +131,9 @@ class Phone(Base):
     display_order: Mapped[int] = mapped_column("display_order")
     phone_number: Mapped[str] = mapped_column("phone_number")
 
+
 class PhoneType(Base):
-    __tablename__='patron_record_phone_type'
+    __tablename__ = 'patron_record_phone_type'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'

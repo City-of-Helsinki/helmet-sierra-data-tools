@@ -24,14 +24,14 @@ class Bib(Base):
     bcode1: Mapped[str] = mapped_column("bcode1")
     bcode2: Mapped[str] = mapped_column("bcode2")
     bcode3: Mapped[str] = mapped_column("bcode3")
-    country_code: Mapped[str] = mapped_column("country_code")   
+    country_code: Mapped[str] = mapped_column("country_code")
     index_change_count: Mapped[str] = mapped_column("index_change_count")
     is_on_course_reserve: Mapped[str] = mapped_column("is_on_course_reserve")
-    is_right_result_exact: Mapped[str] = mapped_column("is_right_result_exact")   
+    is_right_result_exact: Mapped[str] = mapped_column("is_right_result_exact")
     allocation_rule_code: Mapped[str] = mapped_column("allocation_rule_code")
     skip_num: Mapped[int] = mapped_column("skip_num")
     cataloging_date_gmt: Mapped[datetime] = mapped_column("cataloging_date_gmt")
-    marc_type_code: Mapped[str] = mapped_column("marc_type_code")   
+    marc_type_code: Mapped[str] = mapped_column("marc_type_code")
     is_suppressed: Mapped[bool] = mapped_column("is_suppressed")
     leaderfields:  Mapped[List["orm.fields.Leaderfield"]] = relationship(
         "orm.fields.Leaderfield",
