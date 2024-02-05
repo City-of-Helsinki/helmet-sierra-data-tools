@@ -20,9 +20,4 @@ session = Session()
 
 item = session.query(Item).filter(Item.last_checkout_gmt > datetime.now() - timedelta(days=21)).first()
 
-result = []
-if item.bib.items:
-    for qws_instance in item.bib.items:
-        result.append(qws_instance.__dict__)
-
-pprint.PrettyPrinter(depth=4).pprint(item.bib.items[0].bib.__dict__)
+pprint.PrettyPrinter(depth=4).pprint(item.volumes.__dict__)

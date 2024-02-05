@@ -1,17 +1,17 @@
+from __future__ import annotations
+
 from typing import List
-from typing import Optional
 
-from datetime import datetime
-
-from sqlalchemy import ForeignKey, func, Integer, String
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 import orm.base
 import orm.bib
 import orm.item
 
+
 class Leaderfield(orm.base.Base):
-    __tablename__='leader_field'
+    __tablename__ = 'leader_field'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'
@@ -27,8 +27,9 @@ class Leaderfield(orm.base.Base):
     multipart_level_code: Mapped[str] = mapped_column("multipart_level_code")
     base_address: Mapped[str] = mapped_column("base_address")
 
+
 class Controlfield(orm.base.Base):
-    __tablename__='control_field'
+    __tablename__ = 'control_field'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'
@@ -84,8 +85,9 @@ class Controlfield(orm.base.Base):
     occ_num: Mapped[int] = mapped_column("occ_num")
     remainder: Mapped[int] = mapped_column("remainder")
 
+
 class Varfield(orm.base.Base):
-    __tablename__='varfield'
+    __tablename__ = 'varfield'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'
@@ -100,8 +102,9 @@ class Varfield(orm.base.Base):
     field_content: Mapped[str] = mapped_column("field_content")
     subfields: Mapped[List["Subfield"]] = relationship(back_populates="varfield", lazy='joined')
 
+
 class Subfield(orm.base.Base):
-    __tablename__='subfield'
+    __tablename__ = 'subfield'
     __table_args__ = {
         'info': dict(is_view=True),
         'schema': 'sierra_view'

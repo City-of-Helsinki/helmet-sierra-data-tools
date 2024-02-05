@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import List
-# from typing import Optional
 from decimal import Decimal
 from datetime import datetime
 
@@ -13,6 +12,10 @@ import orm.bib
 import orm.bib_item
 import orm.patron
 import orm.fields
+import orm.item_holding
+import orm.holding
+import orm.item_volume
+import orm.volume
 
 
 class Item(orm.base.Base):
@@ -71,4 +74,16 @@ class Item(orm.base.Base):
         "orm.bib.Bib",
         secondary=orm.bib_item.BibItem.__table__,
         back_populates="items"
+    )
+    holdings: Mapped[List["orm.holding.Holding"]] = relationship(
+        "orm.holding.Holding",
+        secondary=orm.item_holding.ItemHolding.__table__,
+        back_populates="item",
+        lazy='select'
+    )
+    volumes: Mapped[List["orm.holding.Holding"]] = relationship(
+        "orm.volume.Volume",
+        secondary=orm.item_volume.ItemVolume.__table__,
+        back_populates="items",
+        lazy='select'
     )

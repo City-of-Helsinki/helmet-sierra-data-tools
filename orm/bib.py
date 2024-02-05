@@ -10,6 +10,12 @@ from orm.base import Base
 import orm.fields
 import orm.item
 import orm.bib_item
+import orm.volume
+import orm.bib_volume
+import orm.order
+import orm.bib_order
+import orm.holding
+import orm.bib_holding
 
 
 class Bib(Base):
@@ -54,6 +60,24 @@ class Bib(Base):
     items: Mapped[List["orm.item.Item"]] = relationship(
         "orm.item.Item",
         secondary=orm.bib_item.BibItem.__table__,
+        back_populates="bib",
+        lazy='select'
+    )
+    volumes: Mapped[List["orm.volume.Volume"]] = relationship(
+        "orm.volume.Volume",
+        secondary=orm.bib_volume.BibVolume.__table__,
+        back_populates="bibs",
+        lazy='select'
+    )
+    orders: Mapped[List["orm.order.Order"]] = relationship(
+        "orm.order.Order",
+        secondary=orm.bib_order.BibOrder.__table__,
+        back_populates="bibs",
+        lazy='select'
+    )
+    holdings: Mapped[List["orm.holding.Holding"]] = relationship(
+        "orm.holding.Holding",
+        secondary=orm.bib_holding.BibHolding.__table__,
         back_populates="bib",
         lazy='select'
     )
