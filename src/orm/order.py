@@ -8,12 +8,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from decimal import Decimal
 
-import orm.base
-import orm.bib
-import orm.bib_order
+import src.orm.base
+import src.orm.bib
+import src.orm.bib_order
 
 
-class Order(orm.base.Base):
+class Order(src.orm.base.Base):
     __tablename__ = 'order_record'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -53,8 +53,8 @@ class Order(orm.base.Base):
     list_price_service_charge: Mapped[Decimal] = mapped_column("list_price_service_charge")
     is_suppressed: Mapped[bool] = mapped_column("is_suppressed")
     fund_copies_paid: Mapped[int] = mapped_column("fund_copies_paid")
-    bibs: Mapped[List["orm.bib.Bib"]] = relationship(
-        "orm.bib.Bib",
-        secondary=orm.bib_order.BibOrder.__table__,
+    bibs: Mapped[List["src.orm.bib.Bib"]] = relationship(
+        "src.orm.bib.Bib",
+        secondary=src.orm.bib_order.BibOrder.__table__,
         back_populates="orders"
     )

@@ -5,12 +5,12 @@ from typing import List
 from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-import orm.base
-import orm.bib
-import orm.item
+import src.orm.base
+import src.orm.bib
+import src.orm.item
 
 
-class Leaderfield(orm.base.Base):
+class Leaderfield(src.orm.base.Base):
     __tablename__ = 'leader_field'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -28,7 +28,7 @@ class Leaderfield(orm.base.Base):
     base_address: Mapped[str] = mapped_column("base_address")
 
 
-class Controlfield(orm.base.Base):
+class Controlfield(src.orm.base.Base):
     __tablename__ = 'control_field'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -86,7 +86,7 @@ class Controlfield(orm.base.Base):
     remainder: Mapped[int] = mapped_column("remainder")
 
 
-class Varfield(orm.base.Base):
+class Varfield(src.orm.base.Base):
     __tablename__ = 'varfield'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -103,7 +103,7 @@ class Varfield(orm.base.Base):
     subfields: Mapped[List["Subfield"]] = relationship(back_populates="varfield", lazy='joined')
 
 
-class Subfield(orm.base.Base):
+class Subfield(src.orm.base.Base):
     __tablename__ = 'subfield'
     __table_args__ = {
         'info': dict(is_view=True),

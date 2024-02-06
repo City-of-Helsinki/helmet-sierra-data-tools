@@ -5,14 +5,14 @@ from typing import List
 from sqlalchemy import Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-import orm.base
-import orm.bib
-import orm.bib_volume
-import orm.item
-import orm.item_volume
+import src.orm.base
+import src.orm.bib
+import src.orm.bib_volume
+import src.orm.item
+import src.orm.item_volume
 
 
-class Volume(orm.base.Base):
+class Volume(src.orm.base.Base):
     __tablename__ = 'volume_record'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -22,13 +22,13 @@ class Volume(orm.base.Base):
     record_id: Mapped[int] = mapped_column("record_id", Integer, primary_key=True)
     sort_order: Mapped[int] = mapped_column("sort_order")
     is_suppressed: Mapped[bool] = mapped_column("is_suppressed")
-    bibs: Mapped[List["orm.bib.Bib"]] = relationship(
-        "orm.bib.Bib",
-        secondary=orm.bib_volume.BibVolume.__table__,
+    bibs: Mapped[List["src.orm.bib.Bib"]] = relationship(
+        "src.orm.bib.Bib",
+        secondary=src.orm.bib_volume.BibVolume.__table__,
         back_populates="volumes"
     )
-    items: Mapped[List["orm.item.Item"]] = relationship(
-        "orm.item.Item",
-        secondary=orm.item_volume.ItemVolume.__table__,
+    items: Mapped[List["src.orm.item.Item"]] = relationship(
+        "src.orm.item.Item",
+        secondary=src.orm.item_volume.ItemVolume.__table__,
         back_populates="volumes"
     )

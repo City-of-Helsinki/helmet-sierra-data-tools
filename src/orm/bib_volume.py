@@ -3,12 +3,10 @@ from __future__ import annotations
 from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column
 
-import orm.base
-import orm.bib
-import orm.volume
+import src.orm.base
 
 
-class BibVolume(orm.base.Base):
+class BibVolume(src.orm.base.Base):
     __tablename__ = 'bib_record_volume_record_link'
     __table_args__ = {
         'info': dict(is_view=True),

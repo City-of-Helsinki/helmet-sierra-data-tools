@@ -7,12 +7,12 @@ from datetime import datetime
 from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from orm.base import Base
-import orm.fields
-import orm.item
+import src.orm.base 
+import src.orm.fields
+import src.orm.item
 
 
-class Patron(Base):
+class Patron(src.orm.base.Base):
     __tablename__ = 'patron_record'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -57,17 +57,17 @@ class Patron(Base):
     fullname: Mapped["FullName"] = relationship(back_populates="patron", lazy='joined')
     addresses: Mapped[List["Address"]] = relationship(back_populates="patron", lazy='joined')
     phones: Mapped[List["Phone"]] = relationship(back_populates="patron", lazy='joined')
-    varfields: Mapped[List["orm.fields.Varfield"]] = relationship(
+    varfields: Mapped[List["src.orm.fields.Varfield"]] = relationship(
         "Varfield",
         primaryjoin='Varfield.record_id == Patron.record_id',
         foreign_keys='Varfield.record_id',
         lazy='joined',
         overlaps="varfields"
     )
-    last_patron_of_items: Mapped[List["orm.item.Item"]] = relationship(back_populates="last_patron")
+    last_patron_of_items: Mapped[List["src.orm.item.Item"]] = relationship(back_populates="last_patron")
 
 
-class Address(Base):
+class Address(src.orm.base.Base):
     __tablename__ = 'patron_record_address'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -89,7 +89,7 @@ class Address(Base):
     country: Mapped[str] = mapped_column("country")
 
 
-class AddressType(Base):
+class AddressType(src.orm.base.Base):
     __tablename__ = 'patron_record_address_type'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -100,7 +100,7 @@ class AddressType(Base):
     address: Mapped["Address"] = relationship(back_populates="address_type")
 
 
-class FullName(Base):
+class FullName(src.orm.base.Base):
     __tablename__ = 'patron_record_fullname'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -117,7 +117,7 @@ class FullName(Base):
     suffix: Mapped[str] = mapped_column("suffix")
 
 
-class Phone(Base):
+class Phone(src.orm.base.Base):
     __tablename__ = 'patron_record_phone'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -132,7 +132,7 @@ class Phone(Base):
     phone_number: Mapped[str] = mapped_column("phone_number")
 
 
-class PhoneType(Base):
+class PhoneType(src.orm.base.Base):
     __tablename__ = 'patron_record_phone_type'
     __table_args__ = {
         'info': dict(is_view=True),

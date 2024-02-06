@@ -5,7 +5,7 @@ import pprint
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from orm.item import Item
+from src.orm.item import Item
 from datetime import datetime, timedelta
 
 load_dotenv()
@@ -20,4 +20,4 @@ session = Session()
 
 item = session.query(Item).filter(Item.last_checkout_gmt > datetime.now() - timedelta(days=21)).first()
 
-pprint.PrettyPrinter(depth=4).pprint(item.volumes.__dict__)
+pprint.PrettyPrinter(depth=4).pprint(item.__dict__)

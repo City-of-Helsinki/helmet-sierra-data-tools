@@ -6,19 +6,19 @@ from datetime import datetime
 from sqlalchemy import Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from orm.base import Base
-import orm.fields
-import orm.item
-import orm.bib_item
-import orm.volume
-import orm.bib_volume
-import orm.order
-import orm.bib_order
-import orm.holding
-import orm.bib_holding
+import src.orm.base
+import src.orm.fields
+import src.orm.item
+import src.orm.bib_item
+import src.orm.volume
+import src.orm.bib_volume
+import src.orm.order
+import src.orm.bib_order
+import src.orm.holding
+import src.orm.bib_holding
 
 
-class Bib(Base):
+class Bib(src.orm.base.Base):
     __tablename__ = 'bib_record'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -39,45 +39,45 @@ class Bib(Base):
     cataloging_date_gmt: Mapped[datetime] = mapped_column("cataloging_date_gmt")
     marc_type_code: Mapped[str] = mapped_column("marc_type_code")
     is_suppressed: Mapped[bool] = mapped_column("is_suppressed")
-    leaderfields:  Mapped[List["orm.fields.Leaderfield"]] = relationship(
-        "orm.fields.Leaderfield",
-        primaryjoin='orm.fields.Leaderfield.record_id == Bib.record_id',
-        foreign_keys='orm.fields.Leaderfield.record_id',
+    leaderfields:  Mapped[List["src.orm.fields.Leaderfield"]] = relationship(
+        "src.orm.fields.Leaderfield",
+        primaryjoin='src.orm.fields.Leaderfield.record_id == Bib.record_id',
+        foreign_keys='src.orm.fields.Leaderfield.record_id',
         lazy='joined'
     )
-    controlfields: Mapped[List["orm.fields.Controlfield"]] = relationship(
-        "orm.fields.Controlfield",
-        primaryjoin='orm.fields.Controlfield.record_id == Bib.record_id',
-        foreign_keys='orm.fields.Controlfield.record_id',
+    controlfields: Mapped[List["src.orm.fields.Controlfield"]] = relationship(
+        "src.orm.fields.Controlfield",
+        primaryjoin='src.orm.fields.Controlfield.record_id == Bib.record_id',
+        foreign_keys='src.orm.fields.Controlfield.record_id',
         lazy='joined'
     )
-    varfields: Mapped[List["orm.fields.Varfield"]] = relationship(
-        "orm.fields.Varfield",
-        primaryjoin='orm.fields.Varfield.record_id == Bib.record_id',
-        foreign_keys='orm.fields.Varfield.record_id',
+    varfields: Mapped[List["src.orm.fields.Varfield"]] = relationship(
+        "src.orm.fields.Varfield",
+        primaryjoin='src.orm.fields.Varfield.record_id == Bib.record_id',
+        foreign_keys='src.orm.fields.Varfield.record_id',
         lazy='joined'
     )
-    items: Mapped[List["orm.item.Item"]] = relationship(
-        "orm.item.Item",
-        secondary=orm.bib_item.BibItem.__table__,
+    items: Mapped[List["src.orm.item.Item"]] = relationship(
+        "src.orm.item.Item",
+        secondary=src.orm.bib_item.BibItem.__table__,
         back_populates="bib",
         lazy='select'
     )
-    volumes: Mapped[List["orm.volume.Volume"]] = relationship(
-        "orm.volume.Volume",
-        secondary=orm.bib_volume.BibVolume.__table__,
+    volumes: Mapped[List["src.orm.volume.Volume"]] = relationship(
+        "src.orm.volume.Volume",
+        secondary=src.orm.bib_volume.BibVolume.__table__,
         back_populates="bibs",
         lazy='select'
     )
-    orders: Mapped[List["orm.order.Order"]] = relationship(
-        "orm.order.Order",
-        secondary=orm.bib_order.BibOrder.__table__,
+    orders: Mapped[List["src.orm.order.Order"]] = relationship(
+        "src.orm.order.Order",
+        secondary=src.orm.bib_order.BibOrder.__table__,
         back_populates="bibs",
         lazy='select'
     )
-    holdings: Mapped[List["orm.holding.Holding"]] = relationship(
-        "orm.holding.Holding",
-        secondary=orm.bib_holding.BibHolding.__table__,
+    holdings: Mapped[List["src.orm.holding.Holding"]] = relationship(
+        "src.orm.holding.Holding",
+        secondary=src.orm.bib_holding.BibHolding.__table__,
         back_populates="bib",
         lazy='select'
     )

@@ -7,18 +7,18 @@ from datetime import datetime
 from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-import orm.base
-import orm.bib
-import orm.bib_item
-import orm.patron
-import orm.fields
-import orm.item_holding
-import orm.holding
-import orm.item_volume
-import orm.volume
+import src.orm.base
+import src.orm.bib
+import src.orm.bib_item
+import src.orm.patron
+import src.orm.fields
+import src.orm.item_holding
+import src.orm.holding
+import src.orm.item_volume
+import src.orm.volume
 
 
-class Item(orm.base.Base):
+class Item(src.orm.base.Base):
     __tablename__ = 'item_record'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -43,7 +43,7 @@ class Item(orm.base.Base):
     copy_num: Mapped[int] = mapped_column("copy_num")
     checkout_statistic_group_code_num: Mapped[int] = mapped_column("checkout_statistic_group_code_num")
     last_patron_record_metadata_id: Mapped[int] = mapped_column(ForeignKey("sierra_view.patron_record.record_id"))
-    last_patron: Mapped["orm.patron.Patron"] = relationship("Patron", back_populates="last_patron_of_items")
+    last_patron: Mapped["src.orm.patron.Patron"] = relationship("Patron", back_populates="last_patron_of_items")
     inventory_gmt: Mapped[datetime] = mapped_column("inventory_gmt")
     checkin_statistics_group_code_num: Mapped[int] = mapped_column("checkin_statistics_group_code_num")
     use3_count: Mapped[int] = mapped_column("use3_count")
@@ -63,27 +63,27 @@ class Item(orm.base.Base):
     is_suppressed: Mapped[bool] = mapped_column("is_suppressed")
     is_available_at_library: Mapped[bool] = mapped_column("is_available_at_library")
     last_status_update: Mapped[datetime] = mapped_column("last_status_update")
-    varfields: Mapped[List["orm.fields.Varfield"]] = relationship(
-        "orm.fields.Varfield",
-        primaryjoin='orm.fields.Varfield.record_id == Item.record_id',
-        foreign_keys='orm.fields.Varfield.record_id',
+    varfields: Mapped[List["src.orm.fields.Varfield"]] = relationship(
+        "src.orm.fields.Varfield",
+        primaryjoin='src.orm.fields.Varfield.record_id == Item.record_id',
+        foreign_keys='src.orm.fields.Varfield.record_id',
         lazy='joined',
         overlaps="varfields"
     )
-    bib: Mapped["orm.bib.Bib"] = relationship(
-        "orm.bib.Bib",
-        secondary=orm.bib_item.BibItem.__table__,
+    bib: Mapped["src.orm.bib.Bib"] = relationship(
+        "src.orm.bib.Bib",
+        secondary=src.orm.bib_item.BibItem.__table__,
         back_populates="items"
     )
-    holdings: Mapped[List["orm.holding.Holding"]] = relationship(
-        "orm.holding.Holding",
-        secondary=orm.item_holding.ItemHolding.__table__,
+    holdings: Mapped[List["src.orm.holding.Holding"]] = relationship(
+        "src.orm.holding.Holding",
+        secondary=src.orm.item_holding.ItemHolding.__table__,
         back_populates="item",
         lazy='select'
     )
-    volumes: Mapped[List["orm.holding.Holding"]] = relationship(
-        "orm.volume.Volume",
-        secondary=orm.item_volume.ItemVolume.__table__,
+    volumes: Mapped[List["src.orm.holding.Holding"]] = relationship(
+        "src.orm.volume.Volume",
+        secondary=src.orm.item_volume.ItemVolume.__table__,
         back_populates="items",
         lazy='select'
     )

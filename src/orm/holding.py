@@ -5,14 +5,14 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from datetime import datetime
 
-import orm.base
-import orm.bib
-import orm.bib_holding
-import orm.item
-import orm.item_holding
+import src.orm.base
+import src.orm.bib
+import src.orm.bib_holding
+import src.orm.item
+import src.orm.item_holding
 
 
-class Holding(orm.base.Base):
+class Holding(src.orm.base.Base):
     __tablename__ = 'holding_record'
     __table_args__ = {
         'info': dict(is_view=True),
@@ -36,13 +36,13 @@ class Holding(orm.base.Base):
     echeckin_code: Mapped[str] = mapped_column("echeckin_code")
     media_type_code: Mapped[str] = mapped_column("media_type_code")
     is_suppressed: Mapped[bool] = mapped_column("is_suppressed")
-    bib: Mapped["orm.bib.Bib"] = relationship(
-        "orm.bib.Bib",
-        secondary=orm.bib_holding.BibHolding.__table__,
+    bib: Mapped["src.orm.bib.Bib"] = relationship(
+        "src.orm.bib.Bib",
+        secondary=src.orm.bib_holding.BibHolding.__table__,
         back_populates="holdings"
     )
-    item: Mapped["orm.item.Item"] = relationship(
-        "orm.item.Item",
-        secondary=orm.item_holding.ItemHolding.__table__,
+    item: Mapped["src.orm.item.Item"] = relationship(
+        "src.orm.item.Item",
+        secondary=src.orm.item_holding.ItemHolding.__table__,
         back_populates="holdings"
     )

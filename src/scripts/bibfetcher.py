@@ -1,24 +1,16 @@
 #!/usr/bin/env python
 import os
 from dotenv import load_dotenv
-import pprint
-import psycopg2
-import sqlalchemy
-from sqlalchemy import create_engine, select, and_, or_
+from sqlalchemy import create_engine, select, and_
 from sqlalchemy.orm import sessionmaker
-import jsonpickle
-import json
-from pathlib import Path
 
-import saxonche
 from saxonche import PySaxonProcessor
 
 from pymarc import Record, Field, Subfield
 from pymarc import marcxml
 
-import orm.bib
-import orm.fields
-from orm.bib import Bib
+from src.orm.bib import Bib
+from src.orm.fields import Subfield
 
 load_dotenv()
 
@@ -28,15 +20,15 @@ Session = sessionmaker(bind=engine)
 
 session = Session()
 
-bibs = session.query(orm.bib.Bib).filter(
-    orm.bib.Bib.record_id.in_(
-        select(orm.fields.Subfield.record_id).where(
+bibs = session.query(Bib).filter(
+    Bib.record_id.in_(
+        select(Subfield.record_id).where(
             and_(
                 and_(
-                    orm.fields.Subfield.marc_tag == "245",
-                    orm.fields.Subfield.tag == "a"
+                    Subfield.marc_tag == "245",
+                    Subfield.tag == "a"
                 ),
-                orm.fields.Subfield.content.contains("Sinuhe")
+                Subfield.content.contains("Sinuhe")
             )
         )
     )).all()

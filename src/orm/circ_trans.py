@@ -5,11 +5,11 @@ from datetime import datetime
 from sqlalchemy import ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from orm.base import Base
-import orm.fields
-import orm.patron
-import orm.bib
-import orm.item
+from src.orm.base import Base
+import src.orm.fields
+import src.orm.patron
+import src.orm.bib
+import src.orm.item
 
 
 class CircTrans(Base):
@@ -24,23 +24,23 @@ class CircTrans(Base):
     source_code: Mapped[str] = mapped_column("source_code")
     op_code: Mapped[str] = mapped_column("op_code")
     patron_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.patron.record_id"))
-    patron: Mapped["orm.patron.Patron"] = relationship(
-        "orm.patron.Patron",
-        primaryjoin='orm.patron.Patron.record_id == CircTrans.patron_record_id',
-        foreign_keys='orm.patron.Patron.record_id'
+    patron: Mapped["src.orm.patron.Patron"] = relationship(
+        "src.orm.patron.Patron",
+        primaryjoin='src.orm.patron.Patron.record_id == CircTrans.patron_record_id',
+        foreign_keys='src.orm.patron.Patron.record_id'
     )
     item_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.item.record_id"))
-    item: Mapped["orm.item.Item"] = relationship(
-        "orm.item.Item",
-        primaryjoin='orm.item.Item.record_id == CircTrans.item_record_id',
-        foreign_keys='orm.item.Item.record_id'
+    item: Mapped["src.orm.item.Item"] = relationship(
+        "src.orm.item.Item",
+        primaryjoin='src.orm.item.Item.record_id == CircTrans.item_record_id',
+        foreign_keys='src.orm.item.Item.record_id'
     )
     volume_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.volume.record_id"))
     bib_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.bib.record_id"))
-    bib: Mapped["orm.bib.Bib"] = relationship(
-        "orm.bib.Bib",
-        primaryjoin='orm.bib.Bib.record_id == CircTrans.bib_record_id',
-        foreign_keys='orm.bib.Bib.record_id'
+    bib: Mapped["src.orm.bib.Bib"] = relationship(
+        "src.orm.bib.Bib",
+        primaryjoin='src.orm.bib.Bib.record_id == CircTrans.bib_record_id',
+        foreign_keys='src.orm.bib.Bib.record_id'
     )
     stat_group_code_num: Mapped[int] = mapped_column("stat_group_code_num")
     due_date_gmt: Mapped[datetime] = mapped_column("due_date_gmt")
