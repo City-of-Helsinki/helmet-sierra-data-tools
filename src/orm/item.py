@@ -67,13 +67,14 @@ class Item(src.orm.base.Base):
         "src.orm.fields.Varfield",
         primaryjoin='src.orm.fields.Varfield.record_id == Item.record_id',
         foreign_keys='src.orm.fields.Varfield.record_id',
-        lazy='joined',
-        overlaps="varfields"
+        overlaps="varfields",
+        lazy='select'
     )
     bib: Mapped["src.orm.bib.Bib"] = relationship(
         "src.orm.bib.Bib",
         secondary=src.orm.bib_item.BibItem.__table__,
-        back_populates="items"
+        back_populates="items",
+        lazy='select'
     )
     holdings: Mapped[List["src.orm.holding.Holding"]] = relationship(
         "src.orm.holding.Holding",
