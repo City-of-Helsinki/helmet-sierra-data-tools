@@ -27,7 +27,7 @@ async def async_main() -> None:
 
     async_session = async_sessionmaker(engine, expire_on_commit=False)
     with open(f'helmet_{datetime.date.today().strftime("%Y%m%d")}.csv', 'w') as outfile:
-        outcsv = csv.writer(outfile, dialect='excel_tab')
+        outcsv = csv.writer(outfile, dialect='excel-tab')
         async with async_session() as session:
             stmt = text(customSelect).execution_options(stream_results=True, yield_per=10000)
             result = await session.stream(stmt)
