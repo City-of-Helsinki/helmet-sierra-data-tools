@@ -4,7 +4,7 @@ from typing import List
 from decimal import Decimal
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Integer
+from sqlalchemy import ForeignKey, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 import src.orm.base
@@ -24,8 +24,8 @@ class Item(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
-    record_id: Mapped[int] = mapped_column("record_id", Integer, primary_key=True)
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
+    record_id: Mapped[int] = mapped_column("record_id", BigInteger, primary_key=True)
     icode1: Mapped[int] = mapped_column("icode1")
     icode2: Mapped[str] = mapped_column("icode2")
     itype_code_num: Mapped[int] = mapped_column("itype_code_num")
@@ -74,7 +74,7 @@ class Item(src.orm.base.Base):
         "src.orm.bib.Bib",
         secondary=src.orm.bib_item.BibItem.__table__,
         back_populates="items",
-        lazy='select'
+        lazy='joined'
     )
     holdings: Mapped[List["src.orm.holding.Holding"]] = relationship(
         "src.orm.holding.Holding",

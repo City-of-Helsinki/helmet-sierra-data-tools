@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from sqlalchemy import Integer
+from sqlalchemy import BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from datetime import datetime
@@ -18,8 +18,8 @@ class Holding(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
-    record_id: Mapped[int] = mapped_column("record_id", Integer, primary_key=True)
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
+    record_id: Mapped[int] = mapped_column("record_id", BigInteger, primary_key=True)
     is_inherit_loc: Mapped[bool] = mapped_column("is_inherit_loc")
     allocation_rule_code: Mapped[str] = mapped_column("allocation_rule_code")
     accounting_unit_code_num: Mapped[int] = mapped_column("accounting_unit_code_num")

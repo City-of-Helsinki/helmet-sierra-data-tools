@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import List
 from datetime import datetime
 
-from sqlalchemy import Integer
+from sqlalchemy import BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 import src.orm.base
@@ -24,8 +24,8 @@ class Bib(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
-    record_id: Mapped[int] = mapped_column("record_id", Integer, primary_key=True)
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
+    record_id: Mapped[int] = mapped_column("record_id", BigInteger, primary_key=True)
     language_code: Mapped[str] = mapped_column("language_code")
     bcode1: Mapped[str] = mapped_column("bcode1")
     bcode2: Mapped[str] = mapped_column("bcode2")

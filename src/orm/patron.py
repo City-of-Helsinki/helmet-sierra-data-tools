@@ -4,7 +4,7 @@ from typing import List
 from decimal import Decimal
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Integer
+from sqlalchemy import ForeignKey, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 import src.orm.base 
@@ -18,8 +18,8 @@ class Patron(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
-    record_id: Mapped[int] = mapped_column("record_id", Integer, primary_key=True)
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
+    record_id: Mapped[int] = mapped_column("record_id", BigInteger, primary_key=True)
     ptype_code: Mapped[int] = mapped_column("ptype_code")
     home_library_code: Mapped[str] = mapped_column("home_library_code")
     expiration_date_gmt: Mapped[datetime] = mapped_column("expiration_date_gmt")
@@ -54,14 +54,14 @@ class Patron(src.orm.base.Base):
     attendance_total: Mapped[int] = mapped_column("attendance_total")
     waitlist_count: Mapped[int] = mapped_column("waitlist_count")
     is_reading_history_opt_in: Mapped[bool] = mapped_column("is_reading_history_opt_in")
-    fullname: Mapped["FullName"] = relationship(back_populates="patron", lazy='joined')
-    addresses: Mapped[List["Address"]] = relationship(back_populates="patron", lazy='joined')
-    phones: Mapped[List["Phone"]] = relationship(back_populates="patron", lazy='joined')
+    fullname: Mapped["FullName"] = relationship(back_populates="patron", lazy='select')
+    addresses: Mapped[List["Address"]] = relationship(back_populates="patron", lazy='select')
+    phones: Mapped[List["Phone"]] = relationship(back_populates="patron", lazy='select')
     varfields: Mapped[List["src.orm.fields.Varfield"]] = relationship(
         "Varfield",
         primaryjoin='Varfield.record_id == Patron.record_id',
         foreign_keys='Varfield.record_id',
-        lazy='joined',
+        lazy='select',
         overlaps="varfields"
     )
     last_patron_of_items: Mapped[List["src.orm.item.Item"]] = relationship(back_populates="last_patron")
@@ -73,10 +73,10 @@ class Address(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
-    patron_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.patron_record.id"))
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
+    patron_record_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("sierra_view.patron_record.id"))
     patron: Mapped["Patron"] = relationship(back_populates="addresses")
-    patron_record_address_type_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.patron_record_address_type.id"))
+    patron_record_address_type_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("sierra_view.patron_record_address_type.id"))
     address_type: Mapped["AddressType"] = relationship("AddressType", primaryjoin="Address.patron_record_address_type_id==AddressType.id")
     display_order: Mapped[int] = mapped_column("display_order")
     addr1: Mapped[str] = mapped_column("addr1")
@@ -95,7 +95,7 @@ class AddressType(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
     code: Mapped[str] = mapped_column("code")
     address: Mapped["Address"] = relationship(back_populates="address_type")
 
@@ -106,8 +106,8 @@ class FullName(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
-    patron_record_id: Mapped[Patron] = mapped_column(Integer, ForeignKey("sierra_view.patron_record.id"))
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
+    patron_record_id: Mapped[Patron] = mapped_column(BigInteger, ForeignKey("sierra_view.patron_record.id"))
     patron: Mapped["Patron"] = relationship(back_populates="fullname")
     display_order: Mapped[int] = mapped_column("display_order")
     prefix: Mapped[str] = mapped_column("prefix")
@@ -123,10 +123,10 @@ class Phone(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
-    patron_record_id: Mapped[Patron] = mapped_column(Integer, ForeignKey("sierra_view.patron_record.id"))
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
+    patron_record_id: Mapped[Patron] = mapped_column(BigInteger, ForeignKey("sierra_view.patron_record.id"))
     patron: Mapped["Patron"] = relationship(back_populates="phones")
-    patron_record_phone_type_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.patron_record_phone_type.id"))
+    patron_record_phone_type_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("sierra_view.patron_record_phone_type.id"))
     phone_type: Mapped["PhoneType"] = relationship(back_populates="phone", lazy='joined')
     display_order: Mapped[int] = mapped_column("display_order")
     phone_number: Mapped[str] = mapped_column("phone_number")
@@ -138,6 +138,6 @@ class PhoneType(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
     code: Mapped[str] = mapped_column("code")
     phone: Mapped["Phone"] = relationship(back_populates="phone_type")

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-from sqlalchemy import Integer
+from sqlalchemy import BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from datetime import datetime
@@ -19,8 +19,8 @@ class Order(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
-    record_id: Mapped[int] = mapped_column("record_id", Integer, primary_key=True)
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
+    record_id: Mapped[int] = mapped_column("record_id", BigInteger, primary_key=True)
     accounting_unit_code_num: Mapped[int] = mapped_column("accounting_unit_code_num")
     acq_type_code: Mapped[str] = mapped_column("acq_type_code")
     catalog_date_gmt: Mapped[datetime] = mapped_column("catalog_date_gmt")

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Integer
+from sqlalchemy import ForeignKey, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.orm.base import Base
@@ -18,25 +18,25 @@ class CircTrans(Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column("id", Integer, primary_key=True)
+    id: Mapped[int] = mapped_column("id", BigInteger, primary_key=True)
     transaction_gmt: Mapped[datetime] = mapped_column("transaction_gmt")
     application_name: Mapped[str] = mapped_column("application_name")
     source_code: Mapped[str] = mapped_column("source_code")
     op_code: Mapped[str] = mapped_column("op_code")
-    patron_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.patron.record_id"))
+    patron_record_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("sierra_view.patron.record_id"))
     patron: Mapped["src.orm.patron.Patron"] = relationship(
         "src.orm.patron.Patron",
         primaryjoin='src.orm.patron.Patron.record_id == CircTrans.patron_record_id',
         foreign_keys='src.orm.patron.Patron.record_id'
     )
-    item_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.item.record_id"))
+    item_record_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("sierra_view.item.record_id"))
     item: Mapped["src.orm.item.Item"] = relationship(
         "src.orm.item.Item",
         primaryjoin='src.orm.item.Item.record_id == CircTrans.item_record_id',
         foreign_keys='src.orm.item.Item.record_id'
     )
-    volume_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.volume.record_id"))
-    bib_record_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.bib.record_id"))
+    volume_record_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("sierra_view.volume.record_id"))
+    bib_record_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("sierra_view.bib.record_id"))
     bib: Mapped["src.orm.bib.Bib"] = relationship(
         "src.orm.bib.Bib",
         primaryjoin='src.orm.bib.Bib.record_id == CircTrans.bib_record_id',

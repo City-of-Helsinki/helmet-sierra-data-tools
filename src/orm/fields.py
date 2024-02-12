@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import List
 
-from sqlalchemy import ForeignKey, Integer, String
+from sqlalchemy import ForeignKey, BigInteger, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 import src.orm.base
@@ -16,8 +16,8 @@ class Leaderfield(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    record_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    record_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     record_status_code: Mapped[str] = mapped_column("record_status_code")
     record_type_code: Mapped[str] = mapped_column("record_type_code")
     bib_level_code: Mapped[str] = mapped_column("bib_level_code")
@@ -34,8 +34,8 @@ class Controlfield(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    record_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    record_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     varfield_type_code: Mapped[str] = mapped_column("varfield_type_code", String)
     control_num: Mapped[int] = mapped_column("control_num")
     p00: Mapped[str] = mapped_column("p00")
@@ -92,8 +92,8 @@ class Varfield(src.orm.base.Base):
         'info': dict(is_view=True),
         'schema': 'sierra_view'
     }
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    record_id: Mapped[int] = mapped_column(Integer, nullable=False)
+    id: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    record_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
     varfield_type_code: Mapped[str] = mapped_column("varfield_type_code")
     marc_tag: Mapped[str] = mapped_column("marc_tag")
     marc_ind1: Mapped[str] = mapped_column("marc_ind1")
@@ -112,8 +112,8 @@ class Subfield(src.orm.base.Base):
     __mapper_args__ = {
         "primary_key": ['record_id', 'varfield_id', 'tag']
     }
-    record_id: Mapped[int] = mapped_column(Integer, nullable=False)
-    varfield_id: Mapped[int] = mapped_column(Integer, ForeignKey("sierra_view.varfield.id"))
+    record_id: Mapped[int] = mapped_column(BigInteger, nullable=False)
+    varfield_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("sierra_view.varfield.id"))
     varfield_type_code: Mapped[str] = mapped_column("field_type_code")
     marc_tag: Mapped[str] = mapped_column("marc_tag")
     marc_ind1: Mapped[str] = mapped_column("marc_ind1")
