@@ -29,7 +29,7 @@ async def async_main() -> None:
     with open(f'helmet_{datetime.date.today().strftime("%Y%m%d")}.csv', 'w') as outfile:
         outcsv = csv.writer(outfile, dialect='excel-tab')
         async with async_session() as session:
-            stmt = text(customSelect).execution_options(stream_results=True, yield_per=10000)
+            stmt = text(customSelect).execution_options(stream_results=True, yield_per=30000)
             result = await session.stream(stmt)
             print(f"Start write at {time.perf_counter() - start:0.4f} seconds")
             outcsv.writerow(result.keys())
