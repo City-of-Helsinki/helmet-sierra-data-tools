@@ -36,10 +36,18 @@ This report is used to generate statistics of the usage of Helmet catalogue per 
 python -m src.scripts.report -s ./src/scripts/sql/items_bibs_checkouts_addresses_patrons.sql -p ./output -f helmet_cat_demo_geo
 ```
 
-### Holdings from another logistics area
+### Checkouts for materials based on logistics area
 
 This report is used to generate statistics of the checkouts of items belonging to another logistics area
 
 ```
 python -m src.scripts.report -s ./src/scripts/sql/holdings_from_other_area.sql -p ./output -f holdings_from_another_area
+```
+
+#### Checkout sums for materials based on logistics area
+
+This report is a summary of checkouts of items based on logistics areas. 
+
+```
+python -m src.scripts.report -s ./src/scripts/sql/sum_holdings_from_other_area.sql -p ./output -f sum_holdings_from_another_area
 ```
