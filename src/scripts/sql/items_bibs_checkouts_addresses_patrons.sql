@@ -45,7 +45,7 @@ bibs AS (
 	SELECT *
 	FROM sierra_view.bib_record
 ),
-subfields AS (
+isbns AS (
 	SELECT
 		record_id,
 		MAX(
@@ -53,16 +53,35 @@ subfields AS (
 			THEN sierra_view.subfield.content
 			ELSE ''
 			END
-		) AS isbn,
-		string_agg(
-			CASE WHEN sierra_view.subfield.marc_tag = '084' AND sierra_view.subfield.tag = 'a'
-			THEN sierra_view.subfield.content
-			ELSE ''
-			END,'||'
-		) AS ykl
+		) AS isbn
 	FROM sierra_view.subfield
 	GROUP BY record_id
 	ORDER BY record_id ASC
+),
+ykl_subfields AS (
+	SELECT *
+	FROM sierra_view.subfield
+	WHERE sierra_view.subfield.marc_tag = '084' AND sierra_view.subfield.tag = '2' AND sierra_view.subfield.content = 'ykl'
+),
+authorative_classifications AS (
+	SELECT
+		sierra_view.varfield.record_id,
+		(array_agg(sierra_view.varfield.id ORDER BY sierra_view.varfield.occ_num ASC))[1] as varfield_id
+	FROM sierra_view.varfield
+	LEFT JOIN ykl_subfields ON ykl_subfields.varfield_id = sierra_view.varfield.id
+	WHERE 
+		sierra_view.varfield.marc_tag = '084' AND 
+		sierra_view.varfield.marc_ind1 != '9' AND
+		ykl_subfields.marc_tag = '084' AND
+		ykl_subfields.tag = '2' AND
+		ykl_subfields.content = 'ykl'
+	GROUP BY sierra_view.varfield.record_id
+	ORDER BY sierra_view.varfield.record_id
+),
+classifications AS (
+	SELECT varfield_id, content as ykl
+	FROM sierra_view.subfield
+	WHERE sierra_view.subfield.marc_tag = '084' AND sierra_view.subfield.tag = 'a'
 ),
 address AS (
 		SELECT
@@ -98,7 +117,8 @@ SELECT
 	items.icode1,
 	bibs.bcode1, bibs.bcode2, bibs.bcode3,
 	bibs.language_code,
-	subfields.isbn,	subfields.ykl,
+	isbns.isbn,
+	classifications.ykl,
 	act_12mo.checkouts_last_12mo,
 	patron_records.checkout_total,
 	patron_records.iii_language_pref_code,
@@ -108,7 +128,9 @@ SELECT
 	FROM items
 	LEFT JOIN bibs_items ON bibs_items.item_record_id = items.record_id
 	LEFT JOIN bibs ON bibs.record_id = bibs_items.bib_record_id
-	LEFT JOIN subfields ON subfields.record_id = bibs.record_id
+	LEFT JOIN authorative_classifications ON authorative_classifications.record_id = bibs.record_id
+	LEFT JOIN classifications ON classifications.varfield_id = authorative_classifications.varfield_id
+	LEFT JOIN isbns ON isbns.record_id = bibs.record_id
 	LEFT JOIN last_checkins ON last_checkins.item_record_id  = items.record_id
 	LEFT JOIN last_checkouts ON last_checkouts.item_record_id  = items.record_id
 	LEFT JOIN circ_trans ON items.record_id = circ_trans.item_record_id AND last_checkouts.last_checkout = circ_trans.transaction_gmt
