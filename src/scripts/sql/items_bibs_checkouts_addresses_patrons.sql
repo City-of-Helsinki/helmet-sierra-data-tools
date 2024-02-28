@@ -1,4 +1,8 @@
 WITH
+stat_groups AS (
+	SELECT code_num, location_code
+	FROM sierra_view.statistic_group
+),
 items AS (
 	SELECT id, record_id, icode1, checkout_statistic_group_code_num, location_code, last_checkin_gmt, last_checkout_gmt
 	FROM sierra_view.item_record
@@ -104,7 +108,7 @@ patron_records AS (
 )
 SELECT
 	items.record_id,
-	items.checkout_statistic_group_code_num	AS out_loc,
+	stat_groups.location_code AS out_loc,
 	items.location_code AS om_loc,
 	(
 		CASE 
@@ -134,6 +138,7 @@ SELECT
 	LEFT JOIN last_checkins ON last_checkins.item_record_id  = items.record_id
 	LEFT JOIN last_checkouts ON last_checkouts.item_record_id  = items.record_id
 	LEFT JOIN circ_trans ON items.record_id = circ_trans.item_record_id AND last_checkouts.last_checkout = circ_trans.transaction_gmt
+	LEFT JOIN stat_groups ON stat_groups.code_num = items.checkout_statistic_group_code_num
 	LEFT JOIN address ON circ_trans.patron_record_id = address.patron_record_id
 	LEFT JOIN act_12mo ON circ_trans.patron_record_id = act_12mo.patron_record_id
 	LEFT JOIN patron_records ON circ_trans.patron_record_id = patron_records.record_id
