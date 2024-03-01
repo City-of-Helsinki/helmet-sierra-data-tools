@@ -6,6 +6,8 @@ stat_groups AS (
 items AS (
 	SELECT id, record_id, icode1, checkout_statistic_group_code_num, location_code, last_checkin_gmt, last_checkout_gmt
 	FROM sierra_view.item_record
+	WHERE
+		sierra_view.item_record.item_status_code != 'p'
 ),
 last_checkouts AS (
 	SELECT
@@ -112,8 +114,15 @@ SELECT
 	items.location_code AS om_loc,
 	(
 		CASE 
-		WHEN (last_checkouts.last_checkout  > items.last_checkin_gmt) THEN 1
-		WHEN (last_checkouts.last_checkout IS NOT NULL) AND (items.last_checkin_gmt IS NULL) THEN 1
+		WHEN
+			(last_checkouts.last_checkout  > items.last_checkin_gmt) AND
+			(items.item_status_code != 'm')
+		THEN 1
+		WHEN
+			(last_checkouts.last_checkout IS NOT NULL) AND
+			(items.last_checkin_gmt IS NULL) AND
+			(items.item_status_code != 'm')
+		THEN 1
 		ELSE 0
 		END
 	) AS lainassa,
