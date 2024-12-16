@@ -3,14 +3,17 @@ import os
 import asyncio
 import time
 import datetime
-import csv
 import argparse
 import pathlib
+
+from importlib import import_module
 
 from dotenv import load_dotenv
 
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 from sqlalchemy.sql import text
+
+from src.scripts.rowprocessors.baserowprocessor import BaseRowProcessor
 
 load_dotenv()
 parser = argparse.ArgumentParser(
@@ -24,7 +27,16 @@ parser.add_argument('-f', '--prefix', type=str, help="Output csv file prefix (re
 parser.add_argument('-b', '--batchsize', type=int, default=30000, help="Yield interval for asynchonous result streaming (optional, default: 30000).", nargs="?")
 parser.add_argument('-t', '--timestamp', type=str, default='%Y%m%d', help="Output CSV file timestamp format string (optional, default: %%Y%%m%%d).", nargs="?")
 parser.add_argument('-d', '--dialect', type=str, default='excel-tab', help="Python CSV dialect (optional, default: excel-tab).", nargs="?")
+parser.add_argument('-r', '--rowprocessor', type=argparse.FileType('r', encoding='UTF-8'), help="Path to python script for additional row processing.", required=False, nargs="?")
 args = parser.parse_args()
+
+try:
+    name = args.rowprocessor.name.replace(".py", "").replace("./", "").replace("/", ".")
+    processor = getattr(import_module(name), "RowProcessor")
+except Exception as e:
+    if e:
+        print(e)
+    processor = BaseRowProcessor
 
 
 async def async_main() -> None:
@@ -37,9 +49,8 @@ async def async_main() -> None:
     start = time.perf_counter()
 
     async_session = async_sessionmaker(engine, expire_on_commit=False)
-    outpath = args.path / f'{args.prefix}_{datetime.datetime.now().strftime(args.timestamp)}.csv'
-    with open(outpath, 'w') as outfile:
-        outcsv = csv.writer(outfile, dialect=args.dialect)
+    with processor(args.path / f'{args.prefix}_{datetime.datetime.now().strftime(args.timestamp)}.csv', args.dialect) as p:
+
         async with async_session() as session:
             stmt = text(
                 args.sqlfile.read()
@@ -49,12 +60,11 @@ async def async_main() -> None:
 
             print(f"Start write at {time.perf_counter() - start:0.4f} seconds")
 
-            outcsv.writerow(result.keys())
+            p.processkeys(result.keys())
 
             async for row in result:
-                outcsv.writerow(row)
+                p.processrow(row)
                 await engine.dispose()
-            outfile.close()
 
         print(f"Finished in {time.perf_counter() - start:0.4f} seconds")
 

@@ -5,3 +5,4 @@ python-dotenv==1.0.0
 sqlalchemy==2.0.25
 jsonpickle==3.0.2
 saxonche==12.4.1.0
+httpx=0.28.1

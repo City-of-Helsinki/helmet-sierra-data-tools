@@ -53,4 +53,4 @@ SELECT
 	LEFT JOIN controlfields ON controlfields.record_id = bibs.record_id
 	LEFT JOIN varfields ON varfields.record_id = bibs.record_id
 	LEFT JOIN subfields ON subfields.varfield_id = varfields.id
-	ORDER BY item.id
+	ORDER BY items.id
