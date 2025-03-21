@@ -1,0 +1,5 @@
+[submodule "Annif-corpora"]
+	path = Annif-corpora
+	url = https://github.com/NatLibFi/Annif-corpora.git
+	shallow = true
+	ignore = all

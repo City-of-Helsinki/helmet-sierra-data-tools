@@ -164,3 +164,6 @@ cython_debug/
 
 # Output directory
 output/
+
+# Annif-corpora submodule
+Annif-corpora/
