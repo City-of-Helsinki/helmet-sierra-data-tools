@@ -168,3 +168,7 @@ output/
 # Annif-corpora submodule
 Annif-corpora/
 Annif-corpora/**
+
+# Annif data
+data/
+data/**

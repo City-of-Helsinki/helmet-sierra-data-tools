@@ -25,16 +25,17 @@ class RowProcessor(BaseRowProcessor):
                              "vantaa_classification", "kauniainen_classification", "espoo_classification", "helsinki_classification")):
             raise ValueError("Incompatible keys.")
         else:
-            super().processkeys(
-                ("bib_number", "record_id", "bib_best_title", "bib_best_author", "isbn", "item_count",
-                 "subject_classification", "ykl_084",
-                 "vantaa_classification", "kauniainen_classification", "espoo_classification", "helsinki_classification",
-                 "ykl", "heuristic_result"
-                 )
-            )
+            pass
+            # do not write keys
 
     def processed(self, param):
-        super().processed(param)
+        self.pool_queue.release()
+        try:
+            result = param.result()
+            if result[2] == "save":
+                self.outcsv.writerow((result[0], result[1]))
+        except Exception as e:
+            print(e)
 
     @classmethod
     def rowprocessingworker(cls, param):
@@ -54,47 +55,33 @@ class RowProcessor(BaseRowProcessor):
             (re.match(cls.fiction_check, "" if espoo_cfn is None else espoo_cfn) is not None) or
             (re.match(cls.fiction_check, "" if helsinki_cfn is None else helsinki_cfn) is not None)
         )
-        heuristic_result = ""
         if is_fiction:
-            heuristic_result = "fiction_"
             match = re.match(cls.ykl_format_check, "" if ykl_084 is None else ykl_084)
             if match is not None:
-                return (
-                    bib_number, record_id, bib_best_title, bib_best_author, isbn, item_count,
-                    subject_cfn, ykl_084, vantaa_cfn, kauniainen_cfn, espoo_cfn, helsinki_cfn,
-                    match[0], heuristic_result + "084_ykl")
+                return (bib_best_title, f"<http://urn.fi/URN:NBN:fi:au:ykl:{match[0]}>", "save")
         else:
-            heuristic_result = "non-fiction_"
             try:
                 match = re.match(cls.ykl_format_check, vantaa_cfn)
                 if match is not None:
-                    return (bib_number, record_id, bib_best_title, bib_best_author, isbn, item_count,
-                            subject_cfn, ykl_084, vantaa_cfn, kauniainen_cfn, espoo_cfn, helsinki_cfn,
-                            match[0], heuristic_result + "vantaa_cfn")
+                    return (bib_best_title, f"<http://urn.fi/URN:NBN:fi:au:ykl:{match[0]}>", "save")
             except Exception:
                 pass
             try:
                 match = re.match(cls.ykl_format_check, espoo_cfn)
                 if match is not None:
-                    return (bib_number, record_id, bib_best_title, bib_best_author, isbn, item_count,
-                            subject_cfn, ykl_084, vantaa_cfn, kauniainen_cfn, espoo_cfn, helsinki_cfn,
-                            match[0], heuristic_result + "espoo_cfn")
+                    return (bib_best_title, f"<http://urn.fi/URN:NBN:fi:au:ykl:{match[0]}>", "save")
             except Exception:
                 pass
             try:
                 match = re.match(cls.ykl_format_check, kauniainen_cfn)
                 if match is not None:
-                    return (bib_number, record_id, bib_best_title, bib_best_author, isbn, item_count,
-                            subject_cfn, ykl_084, vantaa_cfn, kauniainen_cfn, espoo_cfn, helsinki_cfn,
-                            match[0], heuristic_result + "kauniainen_cfn")
+                    return (bib_best_title, f"<http://urn.fi/URN:NBN:fi:au:ykl:{match[0]}>", "save")
             except Exception:
                 pass
             try:
                 match = re.match(cls.ykl_format_check, ykl_084)
                 if match is not None:
-                    return (bib_number, record_id, bib_best_title, bib_best_author, isbn, item_count,
-                            subject_cfn, ykl_084, vantaa_cfn, kauniainen_cfn, espoo_cfn, helsinki_cfn,
-                            match[0], heuristic_result + "084_ykl")
+                    return (bib_best_title, f"<http://urn.fi/URN:NBN:fi:au:ykl:{match[0]}>", "save")
             except Exception:
                 pass
 
@@ -107,9 +94,7 @@ class RowProcessor(BaseRowProcessor):
                 ).json()
                 cfn = cls.cfn_from_finna_result(finna_result)
                 if cfn:
-                    return (bib_number, record_id, bib_best_title, bib_best_author, isbn, item_count,
-                            subject_cfn, ykl_084, vantaa_cfn, kauniainen_cfn, espoo_cfn, helsinki_cfn,
-                            cfn, heuristic_result + "finna_isbn")
+                    return (bib_best_title, f"<http://urn.fi/URN:NBN:fi:au:ykl:{cfn}>", "save")
         except Exception:
             pass
 
@@ -122,35 +107,11 @@ class RowProcessor(BaseRowProcessor):
                 ).json()
                 cfn = cls.cfn_from_finna_result(finna_result)
                 if cfn:
-                    return (bib_number, record_id, bib_best_title, bib_best_author, isbn, item_count,
-                            subject_cfn, ykl_084, vantaa_cfn, kauniainen_cfn, espoo_cfn, helsinki_cfn,
-                            cfn, heuristic_result + "finna_title")
+                    return (bib_best_title, f"<http://urn.fi/URN:NBN:fi:au:ykl:{cfn}>", "save")
         except Exception:
             pass
 
-        try:
-            if bib_best_title is not None:
-                # try to find classification from local Annif on title
-                annif_result = cls.http_client.post(
-                    'http://localhost:5000/v1/projects/tfidf-en/suggest', data={'text': bib_best_title}
-                ).json()
-
-                cfn = None
-                if annif_result['results']:
-                    if len(annif_result['results']) > 0:
-                        cfn = annif_result['results'][0]['notation']
-
-                if cfn is not None:
-                    return (bib_number, record_id, bib_best_title, bib_best_author, isbn, item_count,
-                            subject_cfn, ykl_084, vantaa_cfn, kauniainen_cfn, espoo_cfn, helsinki_cfn,
-                            cfn, heuristic_result + "annif_evaluation")
-        except Exception as e:
-            print(e)
-            pass
-
-        return (bib_number, record_id, bib_best_title, bib_best_author, isbn, item_count,
-                subject_cfn, ykl_084, vantaa_cfn, kauniainen_cfn, espoo_cfn, helsinki_cfn,
-                ykl_084, heuristic_result + "no_match")
+        return (bib_best_title, ykl_084, "skip")
 
     @classmethod
     def cfn_from_finna_result(cls, finna_result):
