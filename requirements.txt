@@ -7,4 +7,4 @@ jsonpickle==3.0.2
 saxonche==12.4.1.0
 httpx==0.28.1
 annif==1.3.1
-unidecode==1.4.0
+uroman==1.3.1.1
