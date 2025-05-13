@@ -1,14 +1,4 @@
 WITH
-items AS (
-	SELECT id, record_id, icode1, icode2, checkout_statistic_group_code_num, location_code, last_checkin_gmt, last_checkout_gmt
-	FROM sierra_view.item_record
-	WHERE
-		sierra_view.item_record.item_status_code != 'p'
-),
-bibs_items AS (
-	SELECT item_record_id, bib_record_id
-	FROM sierra_view.bib_record_item_record_link
-),
 bibs AS (
 	SELECT record_id
 	FROM sierra_view.bib_record
@@ -18,14 +8,19 @@ bib_numbers AS (
 	FROM sierra_view.record_metadata
 	WHERE record_type_code = 'b'
 ),
-item_numbers AS (
-	SELECT id, concat(concat('i',record_num),agency_code_num) as item_number
-	FROM sierra_view.record_metadata
-	WHERE record_type_code = 'i'
-),
 raw_subfields AS (
 	SELECT
 		record_id,
+		json_agg(
+			json_build_object(
+				'marc_tag', marc_tag,
+				'marc_ind1', marc_ind1,
+				'marc_ind2', marc_ind2,
+				'field_type_code', field_type_code,
+				'tag', tag,
+				'content', content
+			)
+		) AS json,
 		string_agg(content, ' ') AS raw_data
 	FROM sierra_view.subfield
 	GROUP BY record_id
@@ -100,35 +95,23 @@ classifications AS (
 	WHERE sierra_view.subfield.marc_tag = '084' AND sierra_view.subfield.tag = 'a'
 )
 SELECT
---	items.record_id as item_record_id,
---	sierra_view.item_record_property.barcode AS item_barcode,
---	sierra_view.item_record_property.call_number AS item_call_number,
-	(array_agg(bib_numbers.bib_number))[1] as bib_number,
-	bibs.record_id,
-	(array_agg(sierra_view.bib_record_property.best_title))[1] AS bib_best_title,
-	(array_agg(sierra_view.bib_record_property.best_author))[1] AS bib_best_author,
-	(array_agg(subfields.isbn))[1] as isbn,
-	COUNT(case when items.icode2 in ('e') THEN items.record_id END) as espoo_item_count,
-	COUNT(case when items.icode2 in ('h') THEN items.record_id END) as helsinki_item_count,
-	COUNT(case when items.icode2 in ('k') THEN items.record_id END) as kauniainen_item_count,
-	COUNT(case when items.icode2 in ('v') THEN items.record_id END) as vantaa_item_count,
-	(array_agg(subfields.subject_classification))[1] as subject_classification,
-	(array_agg(classifications.ykl))[1] as ykl,
-	(array_agg(subfields.vantaa_classification))[1] as vantaa_classification,
-	(array_agg(subfields.kauniainen_classification))[1] as kauniainen_classification,
-	(array_agg(subfields.espoo_classification))[1] as espoo_classification,
-	(array_agg(subfields.helsinki_classification))[1] as helsinki_classification,
-	(array_agg(raw_subfields.raw_data))[1] as raw_data
-	FROM items
-	LEFT JOIN bibs_items ON bibs_items.item_record_id = items.record_id
-	LEFT JOIN bibs ON bibs.record_id = bibs_items.bib_record_id
+	bib_numbers.bib_number,
+	bibs.record_id as bib_record_id,
+	sierra_view.bib_record_property.best_title AS bib_best_title,
+	sierra_view.bib_record_property.best_author AS bib_best_author,
+	subfields.isbn,
+	classifications.ykl,
+	subfields.subject_classification,
+	subfields.vantaa_classification,
+	subfields.kauniainen_classification,
+	subfields.espoo_classification,
+	subfields.helsinki_classification,
+	raw_subfields.raw_data
+	FROM bibs
 	LEFT JOIN authorative_classifications ON authorative_classifications.record_id = bibs.record_id
 	LEFT JOIN classifications ON classifications.varfield_id = authorative_classifications.varfield_id
 	LEFT JOIN subfields ON subfields.record_id = bibs.record_id
 	LEFT JOIN raw_subfields ON raw_subfields.record_id = bibs.record_id
 	LEFT JOIN bib_numbers ON bib_numbers.id = bibs.record_id
-	LEFT JOIN item_numbers ON item_numbers.id = items.record_id
-	LEFT JOIN sierra_view.item_record_property ON sierra_view.item_record_property.item_record_id = items.record_id
 	LEFT JOIN sierra_view.bib_record_property ON sierra_view.bib_record_property.bib_record_id = bibs.record_id
-	GROUP BY bibs.record_id
-	ORDER BY bibs.record_id
+	ORDER BY bib_number

@@ -1,0 +1,1 @@
+SELECT DISTINCT content AS hklj FROM sierra_view.subfield WHERE marc_tag = '095' AND tag = 'a' 

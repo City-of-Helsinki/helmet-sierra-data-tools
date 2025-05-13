@@ -5,6 +5,7 @@ import time
 import datetime
 import argparse
 import pathlib
+import multiprocessing
 
 from importlib import import_module
 
@@ -28,7 +29,12 @@ parser.add_argument('-b', '--batchsize', type=int, default=30000, help="Yield in
 parser.add_argument('-t', '--timestamp', type=str, default='%Y%m%d', help="Output CSV file timestamp format string (optional, default: %%Y%%m%%d).", nargs="?")
 parser.add_argument('-d', '--dialect', type=str, default='excel-tab', help="Python CSV dialect (optional, default: excel-tab).", nargs="?")
 parser.add_argument('-r', '--rowprocessor', type=argparse.FileType('r', encoding='UTF-8'), help="Path to python script for additional row processing.", required=False, nargs="?")
+parser.add_argument('-c', '--cache', type=bool, default=False, help="Cache rows before processing (optional, default: False).", nargs="?")
+
 args = parser.parse_args()
+
+rows = multiprocessing.Manager().list()
+lock = multiprocessing.Lock()
 
 try:
     name = args.rowprocessor.name.replace(".py", "").replace("./", "").replace("/", ".")
@@ -62,9 +68,21 @@ async def async_main() -> None:
 
             p.processkeys(result.keys())
 
-            async for row in result:
-                p.processrow(row)
-                await engine.dispose()
+            if not args.cache:
+                async for row in result:
+                    p.processrow(row)
+                    await engine.dispose()
+            else:
+                async for row in result:
+                    with lock:
+                        rows.append(row)
+                    await engine.dispose()
+
+        if args.cache:
+            print(f"Start processing cache at {time.perf_counter() - start:0.4f} seconds")
+            for row in rows:
+                with lock:
+                    p.processrow(row)
 
         print(f"Finished in {time.perf_counter() - start:0.4f} seconds")
 
